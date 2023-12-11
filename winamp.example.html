@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"
+      integrity="sha512-BrvVYNhKh6yST24E5DY/LopLO5d+8KYmIXyrpBIJ2PK+CyyJw/cLSG/BfJomWLC1IblNrmiJWGlrGueKLd/Ekw=="
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      var api = "xxx"; // API key for last.fm
+      var username = "yyy"; // last.fm username
+      var time = 2; // in seconds
+      const baseUrl = "http://ws.audioscrobbler.com/2.0/";
+      const getRecentParams = `user=${username}&api_key=${api}&format=json&limit=1`;
+      const getTrackParams = `api_key=${api}&format=json`;
+
+      // This variable acts as the comparison value storing
+      // what's currently being showed, so we don't do a
+      // bunch of redundant renders
+      let current;
+      let playTimeStart = Date.now();
+      let progressPerPercent = 435 / 100;
+
+      // Next, we call the last.fm API and pull a JSON response with our latest 1 track
+      function update(previous, onSuccess) {
+        fetch(`${baseUrl}?method=user.getrecenttracks&${getRecentParams}`)
+          .then((response) => response.json())
+          .then((json) => {
+            if (!json.recenttracks) {
+              console.error("error fetching lastfm api:", json.message);
+              return;
+            }
+            const trackSrc = json.recenttracks.track[0];
+
+            const track = {
+              title: trackSrc.name,
+              artist: trackSrc.artist["#text"],
+              album: trackSrc.album["#text"],
+              duration: 0,
+              nowPlaying: trackSrc["@attr"] && trackSrc["@attr"].nowplaying,
+            };
+
+            // compare old vs new
+            if (
+              !!previous &&
+              previous.title == track.title &&
+              previous.album == track.album
+            ) {
+              return;
+            }
+
+            return track;
+          })
+          .then((track) => {
+            if (!track) return;
+            return fetch(
+              `${baseUrl}?method=track.getInfo&${getTrackParams}&artist=${track.artist}&track=${track.title}`
+            )
+              .then((response) => response.json())
+              .then((json) => {
+                if (!json.track) {
+                  console.error("error fetching lastfm api:", json.message);
+                  return;
+                }
+                if (json.track.duration == 0) {
+                  track.duration = 300;
+                } else {
+                  track.duration = +json.track.duration / 1000;
+                }
+                return track;
+              });
+          })
+          .then(onSuccess)
+          .catch((e) => {
+            console.error("error fetching lastfm api:", e);
+            return;
+          });
+      }
+
+      // Now, we update our comparor and the html
+      function setNew(details) {
+        if (!details) return;
+        current = details;
+        playTimeStart = Date.now();
+        progress = 0;
+
+        $("#winamp_progress_bar").css("left", `35px`);
+
+        trackInfo = `${details.title} - ${details.artist} - ${details.album} +++ `;
+
+        $("#trackInfo").html(`${trackInfo}${trackInfo}`);
+      }
+
+      setInterval(function () {
+        update(current, setNew);
+      }, time * 1000);
+
+      setInterval(function () {
+        if (!current) return;
+        if (!current.nowPlaying) {
+          $("#clock_mins_tens").addClass("timer_blank");
+          $("#clock_mins_ones").addClass("timer_blank");
+          $("#clock_secs_tens").addClass("timer_blank");
+          $("#clock_secs_ones").addClass("timer_blank");
+          return;
+        }
+        const progress = (Date.now() - playTimeStart) / 1000;
+        const percent = (progress / current.duration) * 100;
+
+        if (progress < 60) {
+          $("#clock_mins_tens").addClass("timer_0");
+          $("#clock_mins_ones").addClass("timer_0");
+        } else {
+          const mins = Math.floor(progress / 60);
+          const minsTens = Math.floor(mins / 10);
+          const minsOnes = mins % 10;
+          $("#clock_mins_tens").removeClass();
+          $("#clock_mins_ones").removeClass();
+          $("#clock_mins_tens").addClass(`timer_${minsTens}`);
+          $("#clock_mins_ones").addClass(`timer_${minsOnes}`);
+        }
+
+        const secs = Math.floor(progress % 60);
+        const secsTens = Math.floor(secs / 10);
+        const secsOnes = secs % 10;
+        $("#clock_secs_tens").removeClass();
+        $("#clock_secs_ones").removeClass();
+        $("#clock_secs_tens").addClass(`timer_${secsTens}`);
+        $("#clock_secs_ones").addClass(`timer_${secsOnes}`);
+
+        progressBarLoc = Math.min(435, 35 + progressPerPercent * percent);
+
+        $("#winamp_progress_bar").css("left", `${progressBarLoc}px`);
+      }, 990);
+    </script>
+
+    <style>
+      html,
+      body {
+        font-size: 16px;
+        color: white;
+        margin: 0;
+        padding: 0;
+      }
+
+      @font-face {
+        font-family: "Press_Start_2P";
+        src: url(PressStart2P-Regular.ttf);
+        font-size: 12px;
+        font-weight: 100;
+      }
+
+      h2 {
+        font-size: 0.8rem;
+        font-weight: lighter;
+      }
+      h4 {
+        font-size: 0.75rem;
+      }
+
+      h2,
+      h4 {
+        padding: 0;
+        margin: 0;
+        text-transform: capitalize;
+        animation: scroll 8s linear infinite alternate;
+        white-space: nowrap;
+        font-family: press_start_2p;
+        color: greenyellow;
+      }
+
+      @keyframes scroll {
+        0% {
+          transform: translate(25%, 0);
+        }
+        100% {
+          transform: translate(-100%, 0);
+        }
+      }
+
+      #widget {
+        background: black;
+        width: 300px;
+        position: absolute;
+        left: 217px;
+        top: 46px;
+        transition: 0.2s all ease;
+        overflow: hidden;
+        padding: 0.5rem;
+        float: right;
+      }
+
+      #winamp_face {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100px;
+        height: 100px;
+      }
+
+      #winamp_progress_bar {
+        position: absolute;
+        top: 144px;
+        left: 35px; /* 35px is leftmost, 470px is rightmost */
+        width: 100px;
+        height: 100px;
+      }
+
+      #number_location_seconds {
+        position: absolute;
+        top: 50px;
+        left: 100px;
+        width: 18px;
+        height: 26px;
+      }
+
+      .timer_number {
+        background-image: url(images/winamp_numbers.png);
+      }
+
+      .timer_0 {
+        background-image: url(images/winamp_numbers.png);
+        background-position: 0px 0px;
+      }
+
+      .timer_1 {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -20px;
+      }
+
+      .timer_2 {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -40px;
+      }
+
+      .timer_3 {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -60px;
+      }
+
+      .timer_4 {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -80px;
+      }
+
+      .timer_5 {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -100px;
+      }
+
+      .timer_6 {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -120px;
+      }
+
+      .timer_7 {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -140px;
+      }
+
+      .timer_8 {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -160px;
+      }
+
+      .timer_9 {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -180px;
+      }
+
+      .timer_blank {
+        background-image: url(images/winamp_numbers.png);
+        background-position-x: -200px;
+      }
+
+      #clock_mins_tens {
+        position: absolute;
+        top: 52px;
+        left: 96px;
+        width: 18px;
+        height: 26px;
+      }
+
+      #clock_mins_ones {
+        position: absolute;
+        top: 52px;
+        left: 120px;
+        width: 18px;
+        height: 26px;
+      }
+
+      #clock_secs_tens {
+        position: absolute;
+        top: 52px;
+        left: 156px; /* extra 20 for the spacer */
+        width: 18px;
+        height: 26px;
+      }
+
+      #clock_secs_ones {
+        position: absolute;
+        top: 52px;
+        left: 180px;
+        width: 18px;
+        height: 26px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main id="widget">
+      <!-- <h2 id="track">Loading...</h2>
+      <h4 id="artist">Loading...</h4>
+      <h4 id="album">Loading...</h4> -->
+      <h2 id="trackInfo">Loading...</h2>
+    </main>
+    <div id="winamp_face" style="clear: both">
+      <img src="images/winamp_face.png" alt="winamp face" />
+    </div>
+    <div id="winamp_progress_bar" style="clear: both">
+      <img src="images/winamp_progress_bar.png" alt="winamp progress bar" />
+    </div>
+    <div id="clock_mins_tens" class="timer_number" style="clear: both">
+      <img id="clock_mins_tens_img" src="images/number_blank.png" />
+    </div>
+    <div id="clock_mins_ones" class="timer_number" style="clear: both">
+      <img id="clock_mins_ones_img" src="images/number_blank.png" />
+    </div>
+    <div id="clock_secs_tens" class="timer_number" style="clear: both">
+      <img id="clock_secs_tens_img" src="images/number_blank.png" />
+    </div>
+    <div id="clock_secs_ones" class="timer_number" style="clear: both">
+      <img id="clock_secs_ones_img" src="images/number_blank.png" />
+    </div>
+  </body>
+</html>
