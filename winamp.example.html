@@ -29,7 +29,7 @@
           .then((response) => response.json())
           .then((json) => {
             if (!json.recenttracks) {
-              console.error("error fetching lastfm api:", json.message);
+              console.error("error fetching lastfm api A:", json.message);
               return;
             }
             const trackSrc = json.recenttracks.track[0];
@@ -61,8 +61,9 @@
               .then((response) => response.json())
               .then((json) => {
                 if (!json.track) {
-                  console.error("error fetching lastfm api:", json.message);
-                  return;
+                  console.error("error fetching lastfm api B:", json.message);
+                  track.duration = 300;
+                  return track;
                 }
                 if (json.track.duration == 0) {
                   track.duration = 300;
@@ -70,11 +71,16 @@
                   track.duration = +json.track.duration / 1000;
                 }
                 return track;
+              })
+              .catch((e) => {
+                console.error("error fetching lastfm api C:", e);
+                track.duration = 300;
+                return track;
               });
           })
           .then(onSuccess)
           .catch((e) => {
-            console.error("error fetching lastfm api:", e);
+            console.error("error fetching lastfm api D:", e);
             return;
           });
       }
@@ -84,26 +90,47 @@
         if (!details) return;
         current = details;
         playTimeStart = Date.now();
-        progress = 0;
 
         $("#winamp_progress_bar").css("left", `35px`);
 
         trackInfo = `${details.title} - ${details.artist} - ${details.album} +++ `;
 
         $("#trackInfo").html(`${trackInfo}${trackInfo}`);
+
+        initTimers();
+      }
+
+      function clearTimer() {
+        $("#clock_mins_tens").removeClass();
+        $("#clock_mins_ones").removeClass();
+        $("#clock_secs_tens").removeClass();
+        $("#clock_secs_ones").removeClass();
+      }
+
+      function initTimers() {
+        clearTimer();
+        $("#clock_mins_tens").addClass("timer_0");
+        $("#clock_mins_ones").addClass("timer_0");
+        $("#clock_secs_tens").addClass("timer_0");
+        $("#clock_secs_ones").addClass("timer_0");
+      }
+
+      function blankTimer() {
+        clearTimer();
+        $("#clock_mins_tens").addClass("timer_blank");
+        $("#clock_mins_ones").addClass("timer_blank");
+        $("#clock_secs_tens").addClass("timer_blank");
+        $("#clock_secs_ones").addClass("timer_blank");
       }
 
       setInterval(function () {
         update(current, setNew);
-      }, time * 1000);
+      }, time * 2500);
 
       setInterval(function () {
         if (!current) return;
         if (!current.nowPlaying) {
-          $("#clock_mins_tens").addClass("timer_blank");
-          $("#clock_mins_ones").addClass("timer_blank");
-          $("#clock_secs_tens").addClass("timer_blank");
-          $("#clock_secs_ones").addClass("timer_blank");
+          blankTimer();
           return;
         }
         const progress = (Date.now() - playTimeStart) / 1000;
@@ -271,7 +298,7 @@
       }
 
       .timer_blank {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/number_blank.png);
         background-position-x: -200px;
       }
 
