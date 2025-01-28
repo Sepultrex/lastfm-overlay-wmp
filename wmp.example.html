@@ -9,8 +9,8 @@
     ></script>
 
     <script>
-      var api = "xxx"; // API key for last.fm
-      var username = "yyy"; // last.fm username
+      var api = "api"; // API key for last.fm
+      var username = "username"; // last.fm username
       var time = 2; // in seconds
       const baseUrl = "http://ws.audioscrobbler.com/2.0/";
       const getRecentParams = `user=${username}&api_key=${api}&format=json&limit=1`;
@@ -91,11 +91,11 @@
         current = details;
         playTimeStart = Date.now();
 
-        $("#winamp_progress_bar").css("left", `35px`);
+        $("#winamp_progress_bar").css("left", `435px`);
 
-        trackInfo = `${details.title} - ${details.artist} - ${details.album} +++ `;
+        trackInfo = `Song: ${details.title} - ${details.artist}`;
 
-        $("#trackInfo").html(`${trackInfo}${trackInfo}`);
+        $("#trackInfo").html(`${trackInfo}`);
 
         initTimers();
       }
@@ -157,13 +157,22 @@
         $("#clock_secs_tens").addClass(`timer_${secsTens}`);
         $("#clock_secs_ones").addClass(`timer_${secsOnes}`);
 
-        progressBarLoc = Math.min(435, 35 + progressPerPercent * percent);
+        progressBarLoc = Math.min(1000, 435 + progressPerPercent * percent);
 
         $("#winamp_progress_bar").css("left", `${progressBarLoc}px`);
       }, 990);
     </script>
 
     <style>
+
+    @font-face {
+            font-family: 'w95fa';
+            src: url('fonts/w95fa.woff2') format('woff2'),
+                 url('fonts/w95fa.woff') format('woff');
+                 font-size: 12px;
+                 font-weight: 100;
+        }
+
       html,
       body {
         font-size: 16px;
@@ -172,19 +181,13 @@
         padding: 0;
       }
 
-      @font-face {
-        font-family: "Press_Start_2P";
-        src: url(PressStart2P-Regular.ttf);
-        font-size: 12px;
-        font-weight: 100;
-      }
 
       h2 {
-        font-size: 0.8rem;
+        font-size: 1.2rem;
         font-weight: lighter;
       }
       h4 {
-        font-size: 0.75rem;
+        font-size: 0.9rem;
       }
 
       h2,
@@ -192,31 +195,19 @@
         padding: 0;
         margin: 0;
         text-transform: capitalize;
-        animation: scroll 8s linear infinite alternate;
         white-space: nowrap;
-        font-family: press_start_2p;
-        color: greenyellow;
-      }
-
-      @keyframes scroll {
-        0% {
-          transform: translate(25%, 0);
-        }
-        100% {
-          transform: translate(-100%, 0);
-        }
+        font-family: w95fa;
+        color: #00e200;
       }
 
       #widget {
         background: black;
-        width: 300px;
+        width: 690px;
         position: absolute;
-        left: 217px;
-        top: 46px;
-        transition: 0.2s all ease;
+        left: 380px;
+        top: 760px;
         overflow: hidden;
         padding: 0.5rem;
-        float: right;
       }
 
       #winamp_face {
@@ -229,8 +220,8 @@
 
       #winamp_progress_bar {
         position: absolute;
-        top: 144px;
-        left: 35px; /* 35px is leftmost, 470px is rightmost */
+        left: 780px;
+        top: 805px;
         width: 100px;
         height: 100px;
       }
@@ -244,56 +235,56 @@
       }
 
       .timer_number {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
       }
 
       .timer_0 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position: 0px 0px;
       }
 
       .timer_1 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position-x: -20px;
       }
 
       .timer_2 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position-x: -40px;
       }
 
       .timer_3 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position-x: -60px;
       }
 
       .timer_4 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position-x: -80px;
       }
 
       .timer_5 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position-x: -100px;
       }
 
       .timer_6 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position-x: -120px;
       }
 
       .timer_7 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position-x: -140px;
       }
 
       .timer_8 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position-x: -160px;
       }
 
       .timer_9 {
-        background-image: url(images/winamp_numbers.png);
+        background-image: url(images/wmp_numbers.png);
         background-position-x: -180px;
       }
 
@@ -302,35 +293,48 @@
         background-position-x: -200px;
       }
 
+      .clock_car {
+        background-image: url(images/wmp_cln.png);
+        background-position-x: -200px;
+      }
+
       #clock_mins_tens {
         position: absolute;
-        top: 52px;
-        left: 96px;
+        top: 765px;
+        left: 1000px;
         width: 18px;
         height: 26px;
       }
 
       #clock_mins_ones {
         position: absolute;
-        top: 52px;
-        left: 120px;
+        top: 765px;
+        left: 1015px;
         width: 18px;
         height: 26px;
       }
 
       #clock_secs_tens {
         position: absolute;
-        top: 52px;
-        left: 156px; /* extra 20 for the spacer */
+        top: 765px;
+        left: 1035px;
         width: 18px;
         height: 26px;
       }
 
       #clock_secs_ones {
         position: absolute;
-        top: 52px;
-        left: 180px;
+        top: 765px;
+        left: 1050px;
         width: 18px;
+        height: 26px;
+      }
+
+      #clock_car {
+        position: absolute;
+        top: 381px;
+        left: 515px;
+        width: 2px;
         height: 26px;
       }
     </style>
@@ -344,10 +348,10 @@
       <h2 id="trackInfo">Loading...</h2>
     </main>
     <div id="winamp_face" style="clear: both">
-      <img src="images/winamp_face.png" alt="winamp face" />
+      <img src="images/wmp.png" alt="winamp face" />
     </div>
     <div id="winamp_progress_bar" style="clear: both">
-      <img src="images/winamp_progress_bar.png" alt="winamp progress bar" />
+      <img src="images/wmp_bar.png" alt="winamp progress bar" />
     </div>
     <div id="clock_mins_tens" class="timer_number" style="clear: both">
       <img id="clock_mins_tens_img" src="images/number_blank.png" />
@@ -360,6 +364,9 @@
     </div>
     <div id="clock_secs_ones" class="timer_number" style="clear: both">
       <img id="clock_secs_ones_img" src="images/number_blank.png" />
+    </div>
+    <div id="clock_car">
+      <img id="clock_car" src="images/wmp_cln.png" />
     </div>
   </body>
 </html>

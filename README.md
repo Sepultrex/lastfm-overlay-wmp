@@ -1,8 +1,13 @@
-# Last.fm / ListenBrainz Overlay for OBS disguised as Winamp
+# Last.fm / ListenBrainz Overlay for OBS disguised as Windows Media Player 95
 
 The credit for a lot of this goes to [@dylmye](https://github.com/dylmye) for his work on https://github.com/dylmye/lastfm-overlay.
+<br>-TonyAshworth
 
-![This is how the overlay looks in OBS.](screenshot.png)
+The credit for a lot of this goes to [@TonyAshworth](https://github.com/TonyAshworth) for his work on https://github.com/TonyAshworth/lastfm-overlay-winamp.
+<br>-Sepultrex
+
+
+![This is how the overlay looks in OBS.](images/wmp_preview.png)
 
 Below is his readme which still applies to this repo. The only real differences is I've disguised the overlay with some css and images to make it look like a working copy of winamp on your stream. The visualizer doesnt work. The progress bar only works if last.fm reports the duration of the track otherwise the page will take a default length of 5 minutes to make the progress bar move. Your viewers will likely never notice this discrepency. The web page will also take a moment to update when a new song starts so the timer will always be a few seconds off.
 
