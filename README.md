@@ -9,6 +9,11 @@ The credit for a lot of this goes to [@TonyAshworth](https://github.com/TonyAshw
 
 ![This is how the overlay looks in OBS.](images/wmp_preview.png)
 
+
+example usage
+
+https://github.com/user-attachments/assets/6a887613-5b9f-4311-9020-2a3df185ecd0
+
 Below is his readme which still applies to this repo. The only real differences is I've disguised the overlay with some css and images to make it look like a working copy of winamp on your stream. The visualizer doesnt work. The progress bar only works if last.fm reports the duration of the track otherwise the page will take a default length of 5 minutes to make the progress bar move. Your viewers will likely never notice this discrepency. The web page will also take a moment to update when a new song starts so the timer will always be a few seconds off.
 
 This overlay allows you to show what song you're currently listening to on your stream. It's made especially for software like OBS to add functionality to your stream. This solution is much more elegant than telling your viewers the name of every song you're listening to or requiring your users to call a bot. It's also really flexible if you know a bit of CSS and HTML.
